@@ -161,6 +161,30 @@ DFA dfa_minim(DFA &d) {
         }
     }
 
+    //get unreachable states
+
+    std::vector<std::string> reachable_states_vector;
+    std::set<std::string> reachable_states;
+    reachable_states_vector.push_back(dfa.get_initial_state());
+    reachable_states.insert(dfa.get_initial_state());
+    for (int i = 0; i < reachable_states_vector.size(); i++) {
+        for (auto &trans_sym: alphabet) {
+            if (dfa.has_trans(reachable_states_vector[i], trans_sym)) {
+                std::string to_state = dfa.get_trans(reachable_states_vector[i], trans_sym);
+                if (reachable_states.count(to_state) != 1) {
+                    reachable_states_vector.push_back(to_state);
+                    reachable_states.insert(to_state);
+                }
+            }
+        }
+    }
+
+    for (auto &state: dfa.get_states()) {
+        if (reachable_states.count(state) != 1) {
+            dfa.delete_state(state);
+        }
+    }
+
     return dfa;
 //    return d;
 }
